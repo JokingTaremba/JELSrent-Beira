@@ -14,7 +14,7 @@ export const signup = async (req, res, next) => {
 
     try{
             await newUser.save();
-            res.status(201).json("Usuario criado com sucesso!");
+            res.status(201).json("Usuário criado com sucesso!");
         } catch (error){
             next(error);
     }
@@ -26,7 +26,7 @@ export const signin = async (req, res, next) => {
 
     try {
         const validUser = await User.findOne({email});
-        if(!validUser) return next (errorHandler(404, 'Usuario nao encontrado!'));
+        if(!validUser) return next (errorHandler(404, 'Usuário não encontrado!'));
         const validPassword = bcryptjs.compareSync(password, validUser.password);
         if(!validPassword) return next(errorHandler(401, 'Crendecial errada!'));
         const token = jwt.sign({ id: validUser.id}, process.env.JWT_SECRET);
@@ -62,3 +62,12 @@ export const google = async (req, res, next) => {
         next(error)
     }
 };
+
+export const signOut = async (req, res, next) =>{
+    try {
+        res.clearCookie('access_token');
+        res.status(200).json('O usuário foi desconectado!')
+    } catch (error) {
+        next(error)
+    }
+}
