@@ -1,4 +1,5 @@
 import Listing from "../models/listing.model.js";
+import { errorHandler } from "../utils/error.js";
 
 export const createListing = async (req, res, next) =>{
 
@@ -10,3 +11,21 @@ export const createListing = async (req, res, next) =>{
     }
 
 };
+
+export const deleteListing = async(req, res, next) =>{
+    const listing = await Listing.findById(req.params.id);
+    if(!listing){
+        return next(errorHandler(404, 'Listagem não encontrada'));
+    }
+
+    if(req.user.id !== listing.userRef){
+        return next(errorHandler(401, 'Você só pode Apagar suas próprias listagens'));
+    }
+
+    try {
+        await Listing.findByIdAndDelete(req.params.id);
+        res.status(200).json('A listagem foi apagada');
+    } catch (error) {
+        next(error);
+    }
+}
